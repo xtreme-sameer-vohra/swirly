@@ -178,35 +178,6 @@ var Root = React.createClass({displayName: "Root",
     this.setState({filter: event.target.value});
   },
 
-  handleFetch: function(event) {
-    var root = this;
-
-    var url = React.findDOMNode(this.refs.url).value;
-
-    console.log('starting to parse');
-    var goRoutines = [];
-    for (s of document.parsedGoRoutines){
-      goRoutine = new GoroutineStack(s["id"], s["state"], s["waiting"], s["isLocked"]);
-      goRoutine.stack = s["stack"];
-      goRoutines.push(goRoutine); 
-    }
-    console.log('done');
-
-    this.setState({goroutines: goRoutines });
-
-    event.preventDefault();
-  },
-
-  handleDump: function(event) {
-    var dump = React.findDOMNode(this.refs.dump).value;
-    this.setState({goroutines: parseGoroutines(dump)});
-
-    // clear textarea; seems to kill performance if it keeps the data in there
-    React.findDOMNode(this.refs.dump).value = "";
-
-    event.preventDefault();
-  },
-
   render: function() {
     var filteredGoroutines = [];
     for (var i in this.state.goroutines) {
@@ -223,17 +194,8 @@ var Root = React.createClass({displayName: "Root",
           React.createElement("div", {className: "controls"}, 
             React.createElement("div", {className: "filter"}, 
               React.createElement("input", {type: "text", placeholder: "filter...", onChange: this.handleFilter})
-            ), 
-
-            React.createElement("form", {className: "fetch", onSubmit: this.handleFetch}, 
-              React.createElement("input", {type: "text", placeholder: "url", ref: "url"}), 
-              React.createElement("input", {type: "submit", value: "fetch"})
-            ), 
-
-            React.createElement("form", {className: "dump", onSubmit: this.handleDump}, 
-              React.createElement("textarea", {rows: "1", type: "text", placeholder: "dump", ref: "dump"}), 
-              React.createElement("input", {type: "submit", value: "set"})
             )
+
           ), 
 
           React.createElement("div", {className: "goroutines"}, 
