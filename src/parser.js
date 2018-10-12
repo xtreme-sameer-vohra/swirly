@@ -2,7 +2,10 @@ var fs = require('fs');
 
 var dumpFileRegex = /^dump\..*\.vm-.*.log$/
 var goroutineHeaderRegex = /^goroutine (\d+) \[([^,\]]+)(, ([^,\]]+))?(, locked to thread)?\]:$/
-const folderToScan = '.';
+
+
+var folderToScan = process.argv[2] || ".";
+console.log("Scanning :" + folderToScan);
 
 function GoroutineStack(id, state, waiting, isLocked) {
   this.id = id;
@@ -16,12 +19,13 @@ GoroutineStack.prototype.pushStackLine = function(line) {
   this.stack += line + "\n";
 };
 
+
 function parseDumpFile(fileName){
   var goroutine;
   var goroutines = [];
   
   var lineReader = require('readline').createInterface({
-    input: fs.createReadStream(fileName)
+    input: fs.createReadStream(folderToScan + fileName)
   });
   lineReader.on('line', function (line) {
       if (!goroutine) {
@@ -59,6 +63,7 @@ function parseDumpFiles(){
     files.forEach(file => {
       var match = file.match(dumpFileRegex);
       if (match) {
+        console.log("Found dump file: " + file)
         parseDumpFile(file)
       }
     });
