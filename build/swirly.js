@@ -157,9 +157,20 @@ var StackGroup = React.createClass({displayName: "StackGroup",
 
 var Root = React.createClass({displayName: "Root",
   getInitialState: function() {
+
+    var goRoutines = [];
+
+    for (s of document.parsedGoRoutines){
+      goRoutine = new GoroutineStack(s["id"], s["state"], s["waiting"], s["isLocked"]);
+      goRoutine.stack = s["stack"];
+      goRoutines.push(goRoutine); 
+    }
+    //this.setState({goroutines: goRoutines });
+    document.omg = goRoutines;
+
     return {
       filter: "",
-      goroutines: [],
+      goroutines: goRoutines,
     }
   },
 
@@ -172,12 +183,16 @@ var Root = React.createClass({displayName: "Root",
 
     var url = React.findDOMNode(this.refs.url).value;
 
-    $.ajax({
-      url: url,
-      success: function(response) {
-        root.setState({goroutines: parseGoroutines(response)});
-      }
-    });
+    console.log('starting to parse');
+    var goRoutines = [];
+    for (s of document.parsedGoRoutines){
+      goRoutine = new GoroutineStack(s["id"], s["state"], s["waiting"], s["isLocked"]);
+      goRoutine.stack = s["stack"];
+      goRoutines.push(goRoutine); 
+    }
+    console.log('done');
+
+    this.setState({goroutines: goRoutines });
 
     event.preventDefault();
   },
