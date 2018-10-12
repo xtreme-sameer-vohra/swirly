@@ -51,8 +51,6 @@ function parseDumpFile(fileName){
       if(err) {
           return console.log(err);
       }
-
-      console.log("Finished saving parsed content :" + fileName);
     });
   })
 }
@@ -63,7 +61,6 @@ function parseDumpFiles(){
     files.forEach(file => {
       var match = file.match(dumpFileRegex);
       if (match) {
-        console.log("Found dump file: " + file)
         parseDumpFile(file)
       }
     });

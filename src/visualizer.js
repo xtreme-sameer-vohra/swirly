@@ -21,11 +21,13 @@ var indexTemplate = `
 </html>`;
 
 function generateHTMLTemplate(fileName){
-   fs.writeFile(fileName.replace('.js','.html'), indexTemplate.replace('PARSED_CONTENT_REFERENCE', fileName), function(err) {
+   htmlFileName = fileName.replace('.js','.html')
+   fs.writeFile(htmlFileName, indexTemplate.replace('PARSED_CONTENT_REFERENCE', fileName), function(err) {
       if(err) {
           return console.log(err);
       }
     });
+   console.log("Generated : " + htmlFileName)
 }
 
 function parseDumpFiles(){
