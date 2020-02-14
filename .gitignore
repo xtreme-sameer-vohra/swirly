@@ -1,3 +1,4 @@
 /build/.module-cache/
 /build/dump.*.js
+dump.js
 dump.*html
