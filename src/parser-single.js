@@ -1,10 +1,12 @@
 var fs = require('fs');
 
+var tmpDir = "/tmp/" + Math.random().toString(36).substr(2,5)
 var goroutineHeaderRegex = /^goroutine (\d+) \[([^,\]]+)(, ([^,\]]+))?(, locked to thread)?\]:$/
 
+fs.mkdirSync(tmpDir)
 
-var fileToParse = process.argv[2] || ".";
-console.log("Scanning :" + fileToParse);
+
+var fileToParse = process.argv[2];
 
 function GoroutineStack(id, state, waiting, isLocked) {
   this.id = id;
@@ -18,35 +20,20 @@ GoroutineStack.prototype.pushStackLine = function(line) {
   this.stack += line + "\n";
 };
 
-var indexTemplate = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Swirly</title>
-    <script src="jquery.js"></script>
-    <script src="react.js"></script>
-    <script src="dump.js"></script>
-    <link rel="stylesheet" href="swirly.css" />
-  </head>
-  <body>
-    <div id="dumps"></div>
-    <script src="swirly.js"></script>
-  </body>
-</html>`;
-
-function generateHTMLTemplate(){
-   htmlFileName = getFileWritePath("dump.html")
-   fs.writeFile(htmlFileName, indexTemplate, function(err) {
-      if(err) {
-          return console.log(err);
-      }
-    });
-   console.log("Generated : " + htmlFileName)
-}
 
 function getFileWritePath(fileName){
-  return "./build/" + fileName
+  return tmpDir + "/" + fileName
+}
+
+function copyAssetsToDir(){
+  assetsDir = "./build"
+  fs.readdir(assetsDir, (err, files) => {
+    files.forEach(file => {
+      fs.copyFileSync(assetsDir + "/" + file, getFileWritePath(file));
+    });
+  })
+  console.log("Dump can be accessed at :" + getFileWritePath("dump.html"));
+  
 }
 
 function parseDumpFile(fileName){
@@ -76,15 +63,10 @@ function parseDumpFile(fileName){
   lineReader.on('close', function(){
     console.log('Finished parsing :' + fileName);
     jsFile = getFileWritePath("dump.js");
-    fs.writeFile(jsFile, "document.parsedGoRoutines = " + JSON.stringify(goroutines), function(err) {
-      if(err) {
-          return console.log(err);
-      }
-    });
-
-    
+    fs.writeFileSync(jsFile, "document.parsedGoRoutines = " + JSON.stringify(goroutines));
+    copyAssetsToDir();
   })
 }
 
 parseDumpFile(fileToParse);
-generateHTMLTemplate();
+
